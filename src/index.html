@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Read Something</title>
+  </head>
+  <body>
+    <div class="container">
+      <div class="row mt-5">
+        <h1 class="text-center">Cosa vuoi leggere?</h1>
+      </div>
+      <div class="row mt-5 d-flex flex-row justify-content-center">
+        <div class="col-6">
+          <!-- create a form with an input text and a submit button stiled with bootstrap -->
+          <form
+            method="get"
+            id="search-form"
+            class="row flex justify-content-center"
+          >
+            <div class="col-auto">
+              <input
+                type="text"
+                placeholder="Inserisci un genere.."
+                class="form-control"
+                id="search"
+                name="search"
+              />
+            </div>
+            <div class="col-auto p-0">
+              <button type="submit" class="btn btn-primary">
+                <i class="fa-solid fa-magnifying-glass"></i>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+      <!-- cards -->
+      <div class="row mt-5" id="cards"></div>
+    </div>
+  </body>
+</html>
