@@ -3,22 +3,22 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Read Something</title>
+    <title>Owly</title>
   </head>
   <body>
     <div class="container">
-      <div class="row mt-5">
+      <div class="row mt-3 mt-md-5">
         <h1 class="text-center">Cosa vuoi leggere?</h1>
       </div>
-      <div class="row mt-5 d-flex flex-row justify-content-center">
-        <div class="col-6">
+      <div class="row mt-3 mt-md-5 d-flex flex-row justify-content-center">
+        <div class="col-12 col-lg-6">
           <!-- create a form with an input text and a submit button stiled with bootstrap -->
           <form
             method="get"
             id="search-form"
-            class="row flex justify-content-center"
+            class="row g-2 flex justify-content-center"
           >
-            <div class="col-auto">
+            <div class="col-9 col-sm-10">
               <input
                 type="text"
                 placeholder="Inserisci un genere.."
@@ -27,16 +27,16 @@
                 name="search"
               />
             </div>
-            <div class="col-auto p-0">
-              <button type="submit" class="btn btn-primary">
-                <i class="fa-solid fa-magnifying-glass"></i>
+            <div class="col-3 col-sm-2">
+              <button type="submit" class="btn btn-primary w-100">
+                <i class="bi bi-search"></i>
               </button>
             </div>
           </form>
         </div>
       </div>
       <!-- cards -->
-      <div class="row mt-5" id="cards"></div>
+      <div class="row mt-3 mt-md-5 g-3" id="cards"></div>
     </div>
   </body>
 </html>

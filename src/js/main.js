@@ -3,87 +3,131 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 import "../css/style.css";
 import { getBookDescription, getBooks } from "./apiCalls.js";
 
+//get the form
 const form = document.getElementById("search-form");
 
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
 
+  //get the user input
   const searchInput = document.getElementById("search").value;
-  console.log("input", searchInput);
-
-  let books = await getBooks(searchInput);
-  const bookKeys = Object.keys(books);
+  //api call to get the books
+  const books = await getBooks(searchInput);
+  //get the tag where the card of the book will be rendered
   const container = document.getElementById("cards");
 
+  displayBooks(books, container);
+  attachEventListeners();
+});
+
+// UI FUNCTIONS
+/**
+ * function that displays the books
+ * @param {Array} books
+ * @param {DOM element} container
+ */
+function displayBooks(books, container) {
   container.innerHTML = "";
 
-  // Use for...of instead of forEach
-  for (let key of bookKeys) {
-    let book = books[key];
-    console.log("book", book);
+  Object.keys(books).forEach((key, index) => {
+    const book = books[key];
+    const cardHTML = renderBookCard(book, index);
+    container.insertAdjacentHTML("beforeend", cardHTML);
+  });
+}
 
-    // Create authors list HTML
-    let authorsList = book.authors
-      .map((author) => `<li>${author.name}</li>`)
-      .join("");
+/**
+ * function that renders the book card
+ * @param {Object} book
+ * @param {int} index
+ * @returns
+ */
+function renderBookCard(book, index) {
+  const authorsList = book.authors
+    .map((author) => `<li>${author.name}</li>`)
+    .join("");
 
-    const cardHTML = `
-      <div class="col-3 my-2">
-        <div class="card p-3 min-h-15">
-          <div>
-            <div class="row px-2">
-              <div class="col-10">
-                <h5 class="col card-title">${book.title}</h5>
-              </div>
-              <div class="col-2">
-                <button data-key="${book.key}" class="info col btn btn-primary"><i class="bi bi-info-circle"></i></button>
-              </div>
+  return `
+    <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+      <div class="card p-3 h-100">
+        <div>
+          <div class="row px-2">
+            <div class="col-9">
+              <h5 class="card-title mb-0">${book.title}</h5>
             </div>
-            Authors:
-            <ul>
+            <div class="col-3 text-end">
+              <button data-key="${book.key}" data-index="${index}" class="info-btn btn btn-primary btn-sm">
+                <i class="bi bi-info-circle"></i>
+              </button>
+            </div>
+          </div>
+          <div class="mt-2">
+            <strong>Authors:</strong>
+            <ul class="mb-0">
               ${authorsList}
             </ul>
           </div>
-          <div class="description description-container hide" id="description-${key}">
-          </div>
+        </div>
+        <div class="description description-container hide mt-2" id="description-${index}">
         </div>
       </div>
-    `;
+    </div>
+  `;
+}
 
-    container.insertAdjacentHTML("beforeend", cardHTML);
+/**
+ * function that change the icon of the button that shows the description
+ * @param {DOM element} button
+ * @param {boolean} isOpen
+ */
+function updateButtonIcon(button, isOpen) {
+  if (isOpen) {
+    button.classList.remove("btn-primary");
+    button.classList.add("btn-secondary");
+    button.innerHTML = '<i class="bi bi-x-circle"></i>';
+  } else {
+    button.classList.remove("btn-secondary");
+    button.classList.add("btn-primary");
+    button.innerHTML = '<i class="bi bi-info-circle"></i>';
   }
+}
 
-  //seleziono tutti i bottoni 'info'
-  let infoBtns = document.querySelectorAll(".info");
-  //aggiungo un event listener su tutti i bottoni
-  infoBtns.forEach((btn, index) => {
-    btn.addEventListener("click", async () => {
-      //controllo le classi che ha l'elemento clickato
-      const descriptionElement = document.getElementById(
-        `description-${index}`
-      );
-      //se non contiene la classe 'hide' vuol dire che ho clickato per nasconderlo
-      if (!descriptionElement.classList.contains("hide")) {
-        descriptionElement.classList.add("hide");
-        btn.innerHTML = '<i class="bi bi-info-circle"></i>';
-        btn.classList.remove("btn-secondary");
-        btn.classList.add("btn-primary");
-      } else {
-        //prendo la chiave del libro
-        const key = btn.dataset.key;
-        //faccio la chiamata per avere la descrizione del libro
-        let description = await getBookDescription(key);
-        //tolgo la classe 'hide' e inserisco la descrizione
-        descriptionElement.classList.remove("hide");
-        //a volte la description arriva come oggetto e si trova all'interno di 'value'
-        descriptionElement.innerHTML = description.value
-          ? description.value
-          : description;
-        //modifico l'icona del bottone per nascondere la descrizione
-        btn.innerHTML = '<i class="bi bi-x-circle"></i>';
-        btn.classList.remove("btn-primary");
-        btn.classList.add("btn-secondary");
-      }
+// LOGIC FUNCTIONS
+
+/**
+ * function that toggle the description of the card
+ * @param {DOM element} button
+ * @param {int} index
+ */
+async function toggleDescription(button, index) {
+  const descriptionElement = document.getElementById(`description-${index}`);
+  const isVisible = !descriptionElement.classList.contains("hide");
+
+  if (isVisible) {
+    // Hide description
+    descriptionElement.classList.add("hide");
+    updateButtonIcon(button, false);
+  } else {
+    // Show description
+    const key = button.dataset.key;
+    const description = await getBookDescription(key);
+
+    descriptionElement.classList.remove("hide");
+    descriptionElement.innerHTML = description.value || description;
+    updateButtonIcon(button, true);
+  }
+}
+
+/**
+ * function that set the event listener for the description button
+ */
+function attachEventListeners() {
+  const infoButtons = document.querySelectorAll(".info-btn");
+
+  infoButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const index = button.dataset.index;
+      toggleDescription(button, index);
     });
   });
-});
+}
