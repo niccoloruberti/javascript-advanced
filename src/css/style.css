@@ -8,3 +8,12 @@ body {
 .hide {
     display: none;
 }
+
+.min-h-15 {
+    min-height: 25vh;
+}
+
+.description-container {
+    max-height: 40vh;
+    overflow-y: auto;
+}

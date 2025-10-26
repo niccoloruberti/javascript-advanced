@@ -1,4 +1,5 @@
 import "bootstrap/dist/css/bootstrap.min.css";
+import "bootstrap-icons/font/bootstrap-icons.css";
 import "../css/style.css";
 import { getBookDescription, getBooks } from "./apiCalls.js";
 
@@ -28,15 +29,22 @@ form.addEventListener("submit", async (event) => {
 
     const cardHTML = `
       <div class="col-3 my-2">
-        <div class="card p-3 h-100">
-          <div class="info" id="info-${key}" data-key="${book.key}">
-            <h5 class="card-title">${book.title}</h5>
+        <div class="card p-3 min-h-15">
+          <div>
+            <div class="row px-2">
+              <div class="col-10">
+                <h5 class="col card-title">${book.title}</h5>
+              </div>
+              <div class="col-2">
+                <button data-key="${book.key}" class="info col btn btn-primary"><i class="bi bi-info-circle"></i></button>
+              </div>
+            </div>
             Authors:
             <ul>
               ${authorsList}
             </ul>
           </div>
-          <div class="description hide" id="description-${key}">
+          <div class="description description-container hide" id="description-${key}">
           </div>
         </div>
       </div>
@@ -45,29 +53,36 @@ form.addEventListener("submit", async (event) => {
     container.insertAdjacentHTML("beforeend", cardHTML);
   }
 
-  // Now we proceed to adding event listeners
-  let infoContainers = document.querySelectorAll(".info");
-
-  infoContainers.forEach((info, index) => {
-    info.addEventListener("click", async () => {
-      const key = info.dataset.key;
-      console.log("key", key);
-      let description = await getBookDescription(key);
-      info.classList.add("hide");
-      console.log("index", info.getAttribute("id"));
-      //sistemare questa parte usando index
-      const descriptionElement = document.getElementById(`info-${index}`);
-      console.log("element", descriptionElement);
-
-      if (descriptionElement) {
-        descriptionElement.classList.remove("hide");
-        if (description.value) {
-          descriptionElement.innerHTML = description.value;
-        } else {
-          descriptionElement.innerHTML = description;
-        }
+  //seleziono tutti i bottoni 'info'
+  let infoBtns = document.querySelectorAll(".info");
+  //aggiungo un event listener su tutti i bottoni
+  infoBtns.forEach((btn, index) => {
+    btn.addEventListener("click", async () => {
+      //controllo le classi che ha l'elemento clickato
+      const descriptionElement = document.getElementById(
+        `description-${index}`
+      );
+      //se non contiene la classe 'hide' vuol dire che ho clickato per nasconderlo
+      if (!descriptionElement.classList.contains("hide")) {
+        descriptionElement.classList.add("hide");
+        btn.innerHTML = '<i class="bi bi-info-circle"></i>';
+        btn.classList.remove("btn-secondary");
+        btn.classList.add("btn-primary");
       } else {
-        console.error(`Element with id description - ${key} not found`);
+        //prendo la chiave del libro
+        const key = btn.dataset.key;
+        //faccio la chiamata per avere la descrizione del libro
+        let description = await getBookDescription(key);
+        //tolgo la classe 'hide' e inserisco la descrizione
+        descriptionElement.classList.remove("hide");
+        //a volte la description arriva come oggetto e si trova all'interno di 'value'
+        descriptionElement.innerHTML = description.value
+          ? description.value
+          : description;
+        //modifico l'icona del bottone per nascondere la descrizione
+        btn.innerHTML = '<i class="bi bi-x-circle"></i>';
+        btn.classList.remove("btn-primary");
+        btn.classList.add("btn-secondary");
       }
     });
   });
