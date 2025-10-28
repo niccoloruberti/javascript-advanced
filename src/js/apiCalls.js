@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const url = "https://openlibrary.org";
+const url = process.env.API_BASE_URL;
 
 export async function getBooks(genre) {
   console.log("cerco i libri");
